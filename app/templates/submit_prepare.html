@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('submit_prepare.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('submit_prepare.title') }}</h1>
+    <p>{{ t('submit_prepare.subtitle') }}</p>
+</div>
+
+{% if lock_error %}
+<div class="alert alert-error">
+    <strong>{{ t('submit_prepare.scheduler_active') }}</strong> {{ lock_error }}
+    <form method="post" action="/submit/cancel" style="margin-top:0.75rem;">
+        <button type="submit" class="btn" style="background:#dc2626;">{{ t('submit_prepare.cancel_btn') }}</button>
+    </form>
+</div>
+{% endif %}
+
+{% if not check.ready %}
+<div class="alert alert-error">
+    <strong>{{ t('submit_prepare.not_ready') }}</strong>
+    <ul style="margin:0.5rem 0 0 1.25rem;">
+        {% for issue in check.blocking %}
+        <li>{{ issue }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div style="margin-top:1rem; display:flex; gap:1rem;">
+    <a href="/form" class="btn">{{ t('submit_prepare.btn_form') }}</a>
+    <a href="/mapping" class="btn" style="background:#4b5563;">{{ t('submit_prepare.btn_mapping') }}</a>
+    <a href="/config" class="btn" style="background:#4b5563;">{{ t('submit_prepare.btn_config') }}</a>
+    <a href="/dryrun" class="btn" style="background:#4b5563;">{{ t('submit_prepare.btn_dryrun') }}</a>
+</div>
+
+{% else %}
+
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('submit_prepare.summary_title') }}</h2>
+    <table class="info-table">
+        <tr><th>{{ t('submit_prepare.row_endpoint') }}</th><td><code style="font-size:0.8rem; word-break:break-all;">{{ profile.responseUrl }}</code></td></tr>
+        <tr><th>{{ t('submit_prepare.row_form_id') }}</th><td><code>{{ profile.formId }}</code></td></tr>
+        <tr><th>{{ t('submit_prepare.row_attempt') }}</th><td>{{ attempt_times | join(" · ") }}</td></tr>
+    </table>
+</div>
+
+<div style="margin-bottom:1rem; display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+    <span style="font-size:0.9rem; color:#6b7280;">{{ t('submit_prepare.edit_hint') }}</span>
+    <a href="/config" class="btn btn-secondary" style="font-size:0.85rem; padding:0.35rem 0.85rem;">{{ t('submit_prepare.edit_fields_btn') }}</a>
+    <a href="/config#attemptTimes" class="btn btn-secondary" style="font-size:0.85rem; padding:0.35rem 0.85rem;">{{ t('submit_prepare.edit_schedule_btn') }}</a>
+</div>
+
+<div class="alert" style="background:#fefce8; border:1px solid #fde047; color:#713f12; font-size:0.85rem; margin-bottom:1.25rem; padding:0.65rem 1rem;">
+    {{ t('submit_prepare.dryrun_warning') | safe }}
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('submit_prepare.data_title') }}</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>{{ t('submit_prepare.col_field') }}</th>
+                <th>{{ t('submit_prepare.col_entry_id') }}</th>
+                <th>{{ t('submit_prepare.col_value') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry_id, value in payload.items() %}
+            {% if entry_id != "fbzx" %}
+            <tr>
+                <td style="font-weight:600; font-size:0.88rem; color:#374151;">
+                    {{ entry_to_field.get(entry_id, "—") }}
+                </td>
+                <td><code>{{ entry_id }}</code></td>
+                <td>
+                    {% if value is iterable and value is not string %}
+                        {% for v in value %}<div>{{ v }}</div>{% endfor %}
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card" style="border: 2px solid #dc2626; max-width:640px;">
+    <h2 style="color:#dc2626;">{{ t('submit_prepare.confirm_title') }}</h2>
+    <p style="margin-bottom:1rem; color:#555;">
+        {{ t('submit_prepare.confirm_desc', times=attempt_times | join(', ')) | safe }}
+    </p>
+    <p style="margin-bottom:1.25rem; color:#991b1b; font-weight:600;">
+        {{ t('submit_prepare.confirm_warning') }}
+    </p>
+    {% if not lock_error %}
+    <form method="post" action="/submit/confirm">
+        <button type="submit" class="btn" style="background:#dc2626;">
+            {{ t('submit_prepare.confirm_btn') }}
+        </button>
+    </form>
+    {% endif %}
+</div>
+
+{% endif %}
+{% endblock %}

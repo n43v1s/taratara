@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('help.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('help.title') }}</h1>
+    <p>{{ t('help.subtitle') }}</p>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('help.flow_title') }}</h2>
+    <ol class="help-steps">
+        <li>
+            <strong><a href="/form">{{ t('help.step1_title') }}</a></strong>
+            — {{ t('help.step1_desc') }}
+        </li>
+        <li>
+            <strong><a href="/mapping">{{ t('help.step2_title') }}</a></strong>
+            — {{ t('help.step2_desc') | safe }}
+        </li>
+        <li>
+            <strong><a href="/config">{{ t('help.step3_title') }}</a></strong>
+            — {{ t('help.step3_desc') }}
+        </li>
+        <li>
+            <strong><a href="/dryrun">{{ t('help.step4_title') }}</a></strong>
+            — {{ t('help.step4_desc') | safe }}
+        </li>
+        <li>
+            <strong><a href="/submit/prepare">{{ t('help.step5_title') }}</a></strong>
+            — {{ t('help.step5_desc') }}
+        </li>
+        <li>
+            <strong>{{ t('help.step6_title') }}</strong>
+            — {{ t('help.step6_desc') | safe }}
+        </li>
+        <li>
+            <strong><a href="/status">{{ t('help.step7_title') }}</a></strong>
+            — {{ t('help.step7_desc') }}
+        </li>
+    </ol>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('help.safety_title') }}</h2>
+    <ul class="help-list">
+        <li>{{ t('help.safety1') | safe }}</li>
+        <li>{{ t('help.safety2') | safe }}</li>
+        <li>{{ t('help.safety3') | safe }}</li>
+        <li>{{ t('help.safety4') }}</li>
+        <li>{{ t('help.safety5') | safe }}</li>
+        <li>{{ t('help.safety6') }} <a href="/logs">{{ t('logs.title') }}</a>.</li>
+    </ul>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('help.reparse_title') }}</h2>
+    <ul class="help-list">
+        <li>{{ t('help.reparse1') }}</li>
+        <li>{{ t('help.reparse2') }}</li>
+        <li>{{ t('help.reparse3') }}</li>
+        <li>{{ t('help.reparse4') }}</li>
+    </ul>
+    <p style="margin-top:0.75rem; color:#555; font-size:0.9rem;">
+        {{ t('help.reparse_footer') }}
+    </p>
+</div>
+
+<div class="card">
+    <h2>{{ t('help.quicknav_title') }}</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin-top:0.5rem;">
+        <a href="/form" class="btn">{{ t('form.title') }}</a>
+        <a href="/mapping" class="btn" style="background:#4b5563;">{{ t('mapping.title') }}</a>
+        <a href="/config" class="btn" style="background:#4b5563;">{{ t('config.title') }}</a>
+        <a href="/dryrun" class="btn" style="background:#4b5563;">{{ t('dryrun.title') }}</a>
+        <a href="/submit/prepare" class="btn" style="background:#dc2626;">{{ t('submit_prepare.title') }}</a>
+        <a href="/status" class="btn" style="background:#4b5563;">{{ t('status.title') }}</a>
+        <a href="/logs" class="btn" style="background:#4b5563;">{{ t('logs.title') }}</a>
+    </div>
+</div>
+{% endblock %}

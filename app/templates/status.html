@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('status.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('status.title') }}</h1>
+    <p>{{ t('status.subtitle') }}</p>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('status.status_label') }}</h2>
+    <table class="info-table">
+        <tr>
+            <th>{{ t('status.status_label') }}</th>
+            <td>
+                {% if active %}
+                <span class="status-badge" style="background:#fef9c3;color:#854d0e;font-size:0.95rem;">{{ t('status.active') }}</span>
+                {% else %}
+                <span class="status-badge confirmed" style="font-size:0.95rem;">{{ t('status.inactive') }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% if active_run_id %}
+        <tr><th>{{ t('status.active_run_id') }}</th><td><code>{{ active_run_id }}</code></td></tr>
+        {% endif %}
+        {% if latest %}
+        <tr><th>{{ t('status.latest_run_id') }}</th><td>
+            <a href="/logs/{{ latest.runId }}"><code>{{ latest.runId }}</code></a>
+        </td></tr>
+        <tr><th>{{ t('status.mode') }}</th><td>{{ latest.mode }}</td></tr>
+        <tr><th>{{ t('status.time') }}</th><td>{{ latest.startedAt[:19] | replace("T", " ") }}</td></tr>
+        <tr>
+            <th>{{ t('status.status_row') }}</th>
+            <td>
+                {% if latest.status == "success" %}<span class="status-badge auto">{{ latest.status }}</span>
+                {% elif latest.status == "scheduled" %}<span class="status-badge suggest">{{ latest.status }}</span>
+                {% elif latest.status in ["cancelled", "partial"] %}<span class="status-badge unmapped">{{ latest.status }}</span>
+                {% else %}<span class="status-badge">{{ latest.status }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('status.actions_title') }}</h2>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        {% if not active and not (latest and latest.mode == "submit" and latest.status == "success") %}
+        <a href="/submit/prepare" class="btn" style="background:#dc2626;">{{ t('status.activate_btn') }}</a>
+        {% elif active %}
+        <form method="post" action="/submit/cancel" style="display:inline;">
+            <button type="submit" class="btn" style="background:#dc2626;">{{ t('status.cancel_btn') }}</button>
+        </form>
+        {% endif %}
+        <a href="/dryrun" class="btn" style="background:#4b5563;">{{ t('status.dryrun_btn') }}</a>
+        <a href="/logs" class="btn" style="background:#4b5563;">{{ t('status.logs_btn') }}</a>
+    </div>
+</div>
+
+{% if log_tail %}
+<div class="card">
+    <h2>
+        {{ t('status.log_title') }}
+        {% if target_run_id %}
+        — <code style="font-size:0.85rem;">{{ target_run_id }}</code>
+        <a href="/logs/{{ target_run_id }}" style="font-size:0.85rem; margin-left:0.5rem;">{{ t('logs.view_full') }}</a>
+        {% endif %}
+    </h2>
+    <pre class="log-output">{% for line in log_tail %}{{ line }}
+{% endfor %}</pre>
+</div>
+{% else %}
+<div class="card">
+    <p style="color:#999;">{{ t('status.no_log') }}</p>
+</div>
+{% endif %}
+{% endblock %}

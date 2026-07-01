@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('logs.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('logs.title') }}</h1>
+    <p>{{ t('logs.subtitle') }}</p>
+</div>
+
+{% if not sessions and not no_session %}
+<div class="card">
+    <p style="color:#999;">{{ t('logs.empty') }}</p>
+    <a href="/dryrun" class="btn" style="margin-top:1rem; display:inline-block;">{{ t('logs.empty_btn') }}</a>
+</div>
+{% endif %}
+
+{% for session in sessions %}
+<details class="session-group" {% if loop.first %}open{% endif %}>
+    <summary class="session-header">
+        <div class="session-meta">
+            <span class="session-label">{{ session.sessionLabel }}</span>
+            <code class="session-id">{{ session.sessionId }}</code>
+            <span class="session-count">{{ t('logs.run_count', n=session.runs | length) }}</span>
+        </div>
+        <span class="session-toggle-hint">▾</span>
+    </summary>
+
+    <div class="session-body">
+        {% for run in session.runs %}
+        <details class="log-group">
+            <summary class="log-group-header">
+                <div class="log-group-meta">
+                    <code class="log-run-id">{{ run.runId }}</code>
+                    <span class="badge" style="background:#f1f5f9; color:#374151;">{{ run.mode }}</span>
+                    {% if run.status == "success" %}<span class="status-badge auto">{{ run.status }}</span>
+                    {% elif run.status == "scheduled" %}<span class="status-badge suggest">{{ run.status }}</span>
+                    {% elif run.status in ["cancelled", "partial"] %}<span class="status-badge unmapped">{{ run.status }}</span>
+                    {% else %}<span class="status-badge confirmed">{{ run.status }}</span>
+                    {% endif %}
+                    <span class="log-group-time">{{ run.startedAt[:19] | replace("T", " ") }}</span>
+                </div>
+                <a href="/logs/{{ run.runId }}" class="log-full-link" onclick="event.stopPropagation()">
+                    {{ t('logs.view_full') }}
+                </a>
+            </summary>
+            <div class="log-group-body">
+                {% if run.logPreview %}
+                <pre class="log-output" style="margin:0; border-radius:0;">{% for line in run.logPreview %}{{ line }}
+{% endfor %}</pre>
+                {% else %}
+                <p style="padding:0.75rem; color:#999; font-size:0.88rem;">{{ t('logs.log_unavailable') }}</p>
+                {% endif %}
+            </div>
+        </details>
+        {% endfor %}
+    </div>
+</details>
+{% endfor %}
+
+{% if no_session %}
+<details class="session-group">
+    <summary class="session-header">
+        <div class="session-meta">
+            <span class="session-label" style="color:#94a3b8;">{{ t('logs.no_session') }}</span>
+            <span class="session-count">{{ t('logs.run_count', n=no_session | length) }}</span>
+        </div>
+        <span class="session-toggle-hint">▾</span>
+    </summary>
+    <div class="session-body">
+        {% for run in no_session %}
+        <div class="log-group-header" style="cursor:default;">
+            <div class="log-group-meta">
+                <code class="log-run-id">{{ run.runId }}</code>
+                <span class="badge" style="background:#f1f5f9; color:#374151;">{{ run.mode }}</span>
+                <span class="log-group-time">{{ run.startedAt[:19] | replace("T", " ") }}</span>
+            </div>
+            <a href="/logs/{{ run.runId }}" class="log-full-link">{{ t('logs.view_full') }}</a>
+        </div>
+        {% endfor %}
+    </div>
+</details>
+{% endif %}
+{% endblock %}

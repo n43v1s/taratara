@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('reset.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('reset.title') }}</h1>
+    <p>{{ t('reset.subtitle') }}</p>
+</div>
+
+<div id="reset-result"></div>
+
+<!-- Form & Mapping -->
+<div style="display:flex; flex-direction:column; gap:1.25rem;">
+<div class="card" style="border-left: 4px solid #ef4444;">
+    <h2 style="margin-top:0;">{{ t('reset.form_title') }}</h2>
+    {% if has_profile %}
+    <p>{{ t('reset.form_active') }}</p>
+    <ul style="margin:0.5rem 0 1rem; padding-left:1.5rem; font-size:0.9rem; color:#374151;">
+        <li><strong>{{ t('reset.form_session') }}</strong> {{ session_label }} <code style="font-size:0.78rem; color:#64748b;">{{ session_id }}</code></li>
+        <li>{{ t('reset.form_mappings_label') }} {% if has_mappings %}<span style="color:#16a34a;">{{ t('reset.form_mappings_ok') }}</span>{% else %}<span style="color:#ef4444;">{{ t('reset.form_mappings_none') }}</span>{% endif %}</li>
+    </ul>
+    {% else %}
+    <p style="color:#94a3b8; font-size:0.9rem;">{{ t('reset.no_form') }}</p>
+    {% endif %}
+    <form hx-post="/reset/form" hx-target="#reset-result" hx-swap="innerHTML">
+        <button type="submit" class="btn btn-danger"
+            {% if not has_profile %}disabled title="{{ t('reset.no_form') }}"{% endif %}
+            onclick="return confirm('{{ t('reset.form_confirm') }}')">
+            {{ t('reset.form_btn') }}
+        </button>
+    </form>
+</div>
+
+<!-- Run History -->
+<div class="card" style="border-left: 4px solid #f59e0b;">
+    <h2 style="margin-top:0;">{{ t('reset.runs_title') }}</h2>
+    {% if has_runs %}
+    <p style="font-size:0.9rem; color:#374151;">{{ t('reset.runs_desc') | safe }}</p>
+    {% else %}
+    <p style="color:#94a3b8; font-size:0.9rem;">{{ t('reset.no_runs') }}</p>
+    {% endif %}
+    <form hx-post="/reset/runs" hx-target="#reset-result" hx-swap="innerHTML">
+        <button type="submit" class="btn btn-warning"
+            {% if not has_runs %}disabled title="{{ t('reset.no_runs') }}"{% endif %}
+            onclick="return confirm('{{ t('reset.runs_confirm') }}')">
+            {{ t('reset.runs_btn') }}
+        </button>
+    </form>
+</div>
+
+<!-- Scheduler Lock -->
+<div class="card" style="border-left: 4px solid #6366f1;">
+    <h2 style="margin-top:0;">{{ t('reset.lock_title') }}</h2>
+    {% if has_lock %}
+    <p style="font-size:0.9rem; color:#b45309;">{{ t('reset.lock_active') }}</p>
+    {% else %}
+    <p style="color:#94a3b8; font-size:0.9rem;">{{ t('reset.no_lock') }}</p>
+    {% endif %}
+    <form hx-post="/reset/lock" hx-target="#reset-result" hx-swap="innerHTML">
+        <button type="submit" class="btn btn-secondary"
+            {% if not has_lock %}disabled title="{{ t('reset.no_lock') }}"{% endif %}
+            onclick="return confirm('{{ t('reset.lock_confirm') }}')">
+            {{ t('reset.lock_btn') }}
+        </button>
+    </form>
+</div>
+</div>{# end card wrapper #}
+{% endblock %}

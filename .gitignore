@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.env
+
+data/logs/
+data/runs/
+data/scheduler.lock
+data/form-profile.json
+data/tara-caraka-form.config.json
+
+*.pyc

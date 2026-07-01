@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('config.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('config.title') }}</h1>
+    <p>{{ t('config.subtitle') }}</p>
+</div>
+
+{% if saved %}
+<div class="alert alert-success">
+    {{ t('config.saved') }}
+    {% if missing %}
+    <strong>{{ t('config.saved_incomplete', fields=missing | join(', ')) }}</strong>
+    {% else %}
+    {{ t('config.saved_next') }} <a href="/dryrun">{{ t('config.saved_next_link') }}</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<div id="missing-banner" class="alert alert-error" {% if saved or not missing %}style="display:none"{% endif %}>
+    {{ t('config.missing_banner') }}<strong><span id="missing-list">{{ missing | join(", ") }}</span></strong>
+</div>
+
+<form method="post" action="/config/save">
+    <div class="card" style="max-width: 680px;">
+        <h2>{{ t('config.section_child') }}</h2>
+
+        <div class="form-group">
+            <label for="childName">{{ t('config.label_childName') }} <span class="required">{{ t('common.required') }}</span></label>
+            <input type="text" id="childName" name="childName"
+                value="{{ config.childName }}"
+                placeholder="Tara Bintang Rakyanto"
+                class="form-input {% if 'childName' in missing %}input-error{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label for="birthInfo">{{ t('config.label_birthInfo') }} <span class="required">{{ t('common.required') }}</span></label>
+            <input type="text" id="birthInfo" name="birthInfo"
+                value="{{ config.birthInfo }}"
+                placeholder="Jakarta, 01 Januari 2022"
+                class="form-input {% if 'birthInfo' in missing %}input-error{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label>{{ t('config.label_childAge') }} <span class="required">{{ t('common.required') }}</span></label>
+            {% if field_options.childAge %}
+            <div class="checkbox-group">
+                {% for opt in field_options.childAge %}
+                <label class="checkbox-label">
+                    <input type="checkbox" name="childAge" value="{{ opt }}"
+                        {% if config.childAge is string and config.childAge == opt %}checked
+                        {% elif config.childAge is iterable and config.childAge is not string and opt in config.childAge %}checked{% endif %}>
+                    {{ opt }}
+                </label>
+                {% endfor %}
+            </div>
+            {% else %}
+            <input type="text" id="childAge" name="childAge"
+                value="{{ config.childAge }}"
+                placeholder="03  s/d  15 Bulan"
+                class="form-input {% if 'childAge' in missing %}input-error{% endif %}">
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ t('config.label_gender') }} <span class="required">{{ t('common.required') }}</span></label>
+            <div class="radio-group">
+                {% if field_options.gender %}
+                {% for opt in field_options.gender %}
+                <label class="radio-label">
+                    <input type="radio" name="gender" value="{{ opt }}"
+                        {% if config.gender == opt %}checked{% endif %}>
+                    {{ opt }}
+                </label>
+                {% endfor %}
+                {% else %}
+                <label class="radio-label">
+                    <input type="radio" name="gender" value="Laki laki"
+                        {% if config.gender == "Laki laki" %}checked{% endif %}>
+                    Laki laki
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="gender" value="Perempuan"
+                        {% if config.gender == "Perempuan" %}checked{% endif %}>
+                    Perempuan
+                </label>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="religion">{{ t('config.label_religion') }} <span class="required">{{ t('common.required') }}</span></label>
+            <input type="text" id="religion" name="religion"
+                value="{{ config.religion }}"
+                placeholder="Kristen"
+                class="form-input {% if 'religion' in missing %}input-error{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label for="allergy">{{ t('config.label_allergy') }} <span class="required">{{ t('common.required') }}</span></label>
+            <input type="text" id="allergy" name="allergy"
+                value="{{ config.allergy }}"
+                placeholder="Tidak ada / Telur / Penisilin"
+                class="form-input {% if 'allergy' in missing %}input-error{% endif %}">
+        </div>
+    </div>
+
+    <div class="card" style="max-width: 680px; margin-top: 1.25rem;">
+        <h2>{{ t('config.section_parent') }}</h2>
+
+        <div class="form-group">
+            <label for="parentName">{{ t('config.label_parentName') }} <span class="required">{{ t('common.required') }}</span></label>
+            <input type="text" id="parentName" name="parentName"
+                value="{{ config.parentName }}"
+                placeholder="Nama lengkap orang tua / wali"
+                class="form-input {% if 'parentName' in missing %}input-error{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label for="satker">{{ t('config.label_satker') }} <span class="required">{{ t('common.required') }}</span></label>
+            <input type="text" id="satker" name="satker"
+                value="{{ config.satker }}"
+                placeholder="Kemlu / Setjen"
+                class="form-input {% if 'satker' in missing %}input-error{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label for="phoneNumber">{{ t('config.label_phoneNumber') }} <span class="required">{{ t('common.required') }}</span></label>
+            <input type="text" id="phoneNumber" name="phoneNumber"
+                value="{{ config.phoneNumber }}"
+                placeholder="08123456789"
+                class="form-input {% if 'phoneNumber' in missing %}input-error{% endif %}">
+        </div>
+
+        <div class="form-group">
+            <label for="address">{{ t('config.label_address') }} <span class="required">{{ t('common.required') }}</span></label>
+            <textarea id="address" name="address" rows="2"
+                placeholder="Alamat lengkap"
+                class="form-input {% if 'address' in missing %}input-error{% endif %}">{{ config.address }}</textarea>
+        </div>
+    </div>
+
+    <div class="card" style="max-width: 680px; margin-top: 1.25rem;">
+        <h2>{{ t('config.section_booking') }} <span class="required">{{ t('common.required') }}</span></h2>
+        {% if booking_options %}
+        <p style="font-size:0.9rem; color:#555; margin-bottom:0.75rem;">
+            {{ t('config.booking_hint') }}
+        </p>
+        <div class="checkbox-group">
+            {% for opt in booking_options %}
+            <label class="checkbox-label">
+                <input type="checkbox" name="bookingDates" value="{{ opt }}"
+                    {% if opt in config.bookingDates %}checked{% endif %}>
+                {{ opt }}
+            </label>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-error" style="margin:0;">
+            {{ t('config.no_booking') }} <a href="/form">{{ t('config.no_booking_link') }}</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card" style="max-width: 680px; margin-top: 1.25rem;">
+        <h2>{{ t('config.section_attempt') }}</h2>
+        <p style="font-size:0.9rem; color:#555; margin-bottom:0.75rem;">
+            {{ t('config.attempt_hint') | safe }}
+        </p>
+        <div class="form-group">
+            <label for="attemptTimes">{{ t('config.label_attemptTimes') }}</label>
+            <textarea id="attemptTimes" name="attemptTimes" rows="{{ [config.attemptTimes | length, 3] | max + 1 }}"
+                class="form-input" style="font-family: monospace;">{{ config.attemptTimes | join('\n') if config.attemptTimes else '12:59:58\n12:59:59\n13:00:00' }}</textarea>
+        </div>
+    </div>
+
+    <div style="max-width:680px; margin-top:1.25rem; display:flex; gap:1rem; align-items:center;">
+        <button type="submit" class="btn">{{ t('config.save_btn') }}</button>
+        <a href="/mapping" style="font-size:0.9rem; color:#555;">{{ t('config.back_mapping') }}</a>
+    </div>
+</form>
+
+<script>
+(function () {
+    const REQUIRED = [
+        "childName", "birthInfo", "childAge", "gender",
+        "religion", "allergy", "parentName", "satker",
+        "phoneNumber", "address"
+    ];
+
+    function getValue(name) {
+        if (name === "gender") {
+            const checked = document.querySelector('input[name="gender"]:checked');
+            return checked ? checked.value : "";
+        }
+        const el = document.querySelector('[name="' + name + '"]');
+        return el ? el.value.trim() : "";
+    }
+
+    function updateField(name) {
+        const filled = getValue(name).length > 0;
+        if (name !== "gender") {
+            const el = document.querySelector('[name="' + name + '"]');
+            if (el) {
+                el.classList.toggle("input-error", !filled);
+                el.classList.toggle("input-ok", filled);
+            }
+        }
+        return filled;
+    }
+
+    function updateBanner() {
+        const missing = REQUIRED.filter(name => !getValue(name));
+        const banner = document.getElementById("missing-banner");
+        if (!banner) return;
+        if (missing.length === 0) {
+            banner.style.display = "none";
+        } else {
+            banner.style.display = "";
+            const span = document.getElementById("missing-list");
+            if (span) span.textContent = missing.join(", ");
+        }
+    }
+
+    function onAnyChange() {
+        REQUIRED.forEach(updateField);
+        updateBanner();
+    }
+
+    document.querySelectorAll("input, textarea, select").forEach(function(el) {
+        el.addEventListener("input", onAnyChange);
+        el.addEventListener("change", onAnyChange);
+    });
+
+    onAnyChange();
+})();
+</script>
+{% endblock %}

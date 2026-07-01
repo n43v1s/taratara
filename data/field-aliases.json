@@ -1,0 +1,78 @@
+{
+  "childName": [
+    "Nama Anak",
+    "Nama Lengkap Anak",
+    "Nama Balita",
+    "Nama"
+  ],
+  "birthInfo": [
+    "Tanggal Lahir",
+    "Tgl Lahir",
+    "Tanggal Lahir Anak",
+    "Tempat Tanggal Lahir",
+    "TTL"
+  ],
+  "childAge": [
+    "Usia Anak",
+    "Umur Anak",
+    "Usia",
+    "Umur"
+  ],
+  "gender": [
+    "Jenis Kelamin",
+    "Jenis Kelamin Anak",
+    "Gender"
+  ],
+  "religion": [
+    "Agama",
+    "Agama Anak"
+  ],
+  "parentName": [
+    "Nama Orang Tua",
+    "Nama Orangtua",
+    "Nama Ortu",
+    "Nama Wali",
+    "NAMA ORAGTUA",
+    "Nama Ayah/Ibu",
+    "Nama Ibu",
+    "Nama Ayah"
+  ],
+  "satker": [
+    "Satker",
+    "Satuan Kerja",
+    "Unit Kerja",
+    "Instansi",
+    "Tempat Kerja Orang Tua"
+  ],
+  "phoneNumber": [
+    "Nomor HP",
+    "No HP",
+    "Nomor Telepon",
+    "No Telepon",
+    "No. HP",
+    "Nomor WA",
+    "No WA",
+    "Kontak"
+  ],
+  "address": [
+    "Alamat",
+    "Alamat Lengkap",
+    "Alamat Rumah",
+    "Domisili"
+  ],
+  "allergy": [
+    "Alergi",
+    "Riwayat Alergi",
+    "Alergi Anak",
+    "Alergi Makanan/Obat"
+  ],
+  "bookingDates": [
+    "Tanggal Booking",
+    "Tanggal",
+    "Pilih Tanggal",
+    "Tanggal Kedatangan",
+    "Tanggal Kunjungan",
+    "Pilih Jadwal",
+    "Jadwal Kunjungan"
+  ]
+}

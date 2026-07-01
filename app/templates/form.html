@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('form.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('form.title') }}</h1>
+    <p>{{ t('form.subtitle') }}</p>
+</div>
+
+<div class="card" style="max-width: 640px; margin-bottom: 2rem;">
+    <form method="post" action="/form/parse">
+        <label for="url"><strong>{{ t('form.url_label') }}</strong></label>
+        <input
+            type="url"
+            id="url"
+            name="url"
+            placeholder="https://docs.google.com/forms/d/e/..."
+            required
+            style="width:100%; margin: 0.5rem 0 1rem; padding: 0.5rem; font-size:0.95rem; border:1px solid #cbd5e1; border-radius:5px;"
+        >
+        <button type="submit" class="btn">{{ t('form.parse_btn') }}</button>
+    </form>
+</div>
+
+{% if error %}
+<div class="alert alert-error">
+    <strong>{{ t('form.error_label') }}</strong> {{ error }}
+</div>
+{% endif %}
+
+{% if result %}
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h2>{{ t('form.result_title') }}</h2>
+    <table class="info-table">
+        <tr><th>{{ t('form.field_form_id') }}</th><td><code>{{ result.formId }}</code></td></tr>
+        <tr><th>Response URL</th><td><code>{{ result.responseUrl }}</code></td></tr>
+        <tr><th>fbzx</th><td><code>{{ result.fbzx or "-" }}</code></td></tr>
+        <tr><th>{{ t('form.field_parsed_at') }}</th><td>{{ result.parsedAt }}</td></tr>
+        <tr><th>{{ t('form.field_count') }}</th><td>{{ result.fields | length }}</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>{{ t('form.detected_fields') }}</h2>
+    {% if result.fields %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{{ t('form.col_label') }}</th>
+                <th>{{ t('form.col_options') }}</th>
+                <th>{{ t('form.col_type') }}</th>
+                <th>{{ t('form.col_entry_id') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for field in result.fields %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ field.label }}</td>
+                <td>
+                    {% if field.options %}
+                    <ul class="option-list">
+                        {% for opt in field.options %}
+                        <li>{{ opt }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <span style="color:#999">—</span>
+                    {% endif %}
+                </td>
+                <td><span class="badge">{{ field.type }}</span></td>
+                <td><code>{{ field.entryId }}</code></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 1.25rem;">
+        <a href="/mapping" class="btn">{{ t('form.next_mapping') }}</a>
+    </div>
+    {% else %}
+    <p style="color:#999">{{ t('form.no_fields') }}</p>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

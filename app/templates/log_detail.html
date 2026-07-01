@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Log {{ run_id }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('log_detail.title') }}</h1>
+    <p><code>{{ run_id }}</code></p>
+</div>
+
+{% if run %}
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('log_detail.run_summary') }}</h2>
+    <table class="info-table">
+        <tr><th>{{ t('log_detail.row_run_id') }}</th><td><code>{{ run.runId }}</code></td></tr>
+        <tr><th>{{ t('log_detail.row_mode') }}</th><td>{{ run.mode }}</td></tr>
+        <tr><th>{{ t('log_detail.row_time') }}</th><td>{{ run.startedAt }}</td></tr>
+        <tr>
+            <th>{{ t('log_detail.row_status') }}</th>
+            <td>
+                {% if run.status == "success" %}
+                <span class="status-badge auto">{{ run.status }}</span>
+                {% elif run.status == "scheduled" %}
+                <span class="status-badge suggest">{{ run.status }}</span>
+                {% elif run.status in ["cancelled", "partial"] %}
+                <span class="status-badge unmapped">{{ run.status }}</span>
+                {% else %}
+                <span class="status-badge confirmed">{{ run.status }}</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% if run.responseUrl %}
+        <tr><th>{{ t('log_detail.row_endpoint') }}</th><td><code style="font-size:0.8rem; word-break:break-all;">{{ run.responseUrl }}</code></td></tr>
+        {% endif %}
+        {% if run.get("endedAt") %}
+        <tr><th>{{ t('log_detail.row_ended') }}</th><td>{{ run.endedAt }}</td></tr>
+        {% endif %}
+        {% if run.get("cancelledAt") %}
+        <tr><th>{{ t('log_detail.row_cancelled') }}</th><td>{{ run.cancelledAt }}</td></tr>
+        {% endif %}
+    </table>
+</div>
+
+{% if run.get("results") %}
+<div class="card" style="margin-bottom:1.25rem;">
+    <h2>{{ t('log_detail.attempts_title') }}</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>{{ t('log_detail.col_attempt_time') }}</th>
+                <th>{{ t('log_detail.col_http_status') }}</th>
+                <th>{{ t('log_detail.col_error') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in run.results %}
+            <tr>
+                <td>{{ r.time }}</td>
+                <td>
+                    {% if r.status == 200 %}
+                    <span class="status-badge auto">{{ r.status }}</span>
+                    {% elif r.status %}
+                    <span class="status-badge unmapped">{{ r.status }}</span>
+                    {% else %}—{% endif %}
+                </td>
+                <td style="color:#dc2626; font-size:0.85rem;">{{ r.error or "—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endif %}
+
+<div class="card">
+    <h2>{{ t('log_detail.log_output') }}</h2>
+    <pre class="log-output">{{ log_text }}</pre>
+</div>
+
+<div style="margin-top:1.25rem;">
+    <a href="/logs" style="font-size:0.9rem; color:#555;">{{ t('log_detail.back') }}</a>
+</div>
+{% endblock %}

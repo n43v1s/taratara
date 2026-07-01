@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('nav.dashboard') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('dashboard.title') }}</h1>
+    <p>{{ t('dashboard.subtitle') }}</p>
+</div>
+
+<!-- Flow Diagram -->
+<div class="flow-container">
+    {% for step in flow.steps %}
+    <div class="flow-step flow-{{ step.state }}"
+         {% if step.state not in ['blocked'] %}onclick="window.location='{{ step.url }}'"{% endif %}
+         title="{{ step.detail }}">
+        <div class="flow-icon">
+            {% if step.state == 'done' %}✓
+            {% elif step.state == 'active' %}●
+            {% elif step.state == 'ready' %}→
+            {% else %}—
+            {% endif %}
+        </div>
+        <div class="flow-step-text">
+        <div class="flow-label">{{ t(step.label_key) }}</div>
+        <div class="flow-detail">
+            {%- if step.detail -%}
+                {{ step.detail }}
+            {%- elif step.detail_key -%}
+                {{ t(step.detail_key, step.detail_params) }}
+            {%- endif -%}
+        </div>
+        </div>{# end flow-step-text #}
+    </div>
+    {% if not loop.last %}
+    <div class="flow-arrow">›</div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+{% if flow.steps[-1].state == 'done' %}
+<div style="margin-top:1.5rem; padding:1rem 1.25rem; background:#f0fdf4; border:1px solid #86efac; border-radius:8px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+    <div>
+        <strong style="color:#15803d;">{{ t('dashboard.session_done_label') }}</strong>
+        <span style="color:#166534; font-size:0.9rem;"> {{ t('dashboard.session_done_sub') }}</span>
+    </div>
+    <form method="post" action="/reset/form" onsubmit="return confirm('{{ t('dashboard.new_session_confirm') }}')">
+        <button type="submit" class="btn" style="background:#15803d;">{{ t('dashboard.new_session_btn') }}</button>
+    </form>
+</div>
+{% endif %}
+
+<!-- Quick action cards -->
+<div class="card-grid" style="margin-top:2rem;">
+    <div class="card">
+        <h2>{{ t('dashboard.card_form_title') }}</h2>
+        <p>{{ t('dashboard.card_form_desc') }}</p>
+        <a href="/form" class="btn">{{ t('dashboard.card_form_btn') }}</a>
+    </div>
+    <div class="card">
+        <h2>{{ t('dashboard.card_config_title') }}</h2>
+        <p>{{ t('dashboard.card_config_desc') }}</p>
+        <a href="/config" class="btn">{{ t('dashboard.card_config_btn') }}</a>
+    </div>
+    <div class="card">
+        <h2>{{ t('dashboard.card_status_title') }}</h2>
+        <p>{{ t('dashboard.card_status_desc') }}</p>
+        <a href="/status" class="btn">{{ t('dashboard.card_status_btn') }}</a>
+    </div>
+    <div class="card">
+        <h2>{{ t('dashboard.card_logs_title') }}</h2>
+        <p>{{ t('dashboard.card_logs_desc') }}</p>
+        <a href="/logs" class="btn">{{ t('dashboard.card_logs_btn') }}</a>
+    </div>
+</div>
+
+<!-- Developer Testing -->
+<div class="card dev-card" style="margin-top:2rem; background:#fefce8; border-color:#ca8a04;">
+    <div class="dev-badge">{{ t('dashboard.dev_badge') }}</div>
+    <h2 style="margin-top:0.5rem;">{{ t('dashboard.dev_title') }}</h2>
+    <p style="font-size:0.9rem; color:#78350f;" id="dev-desc-text">
+        {{ t('dashboard.dev_desc', delay='30') | safe }}
+    </p>
+    <div id="test-submit-result"></div>
+    <form hx-post="/submit/test" hx-target="#test-submit-result" hx-swap="innerHTML"
+          onsubmit="return confirm('{{ t('dashboard.dev_confirm') }}')">
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
+            <label style="font-size:0.9rem; color:#78350f; font-weight:500;">{{ t('dashboard.dev_delay_label') }}</label>
+            <input type="number" name="delay_seconds" value="30" min="5" max="3600" id="dev-delay-input"
+                   style="width:80px; padding:0.35rem 0.5rem; border:1px solid #d97706; border-radius:5px; font-size:0.9rem;"
+                   oninput="updateDevDesc(this.value)">
+        </div>
+        <button type="submit" class="btn btn-warning">{{ t('dashboard.dev_btn') }}</button>
+    </form>
+</div>
+
+<script>
+(function() {
+    var template = {{ t('dashboard.dev_desc', delay='__DELAY__') | tojson }};
+    function updateDevDesc(val) {
+        var el = document.getElementById('dev-desc-text');
+        if (el) el.innerHTML = template.replace('__DELAY__', val || '30');
+    }
+    var input = document.getElementById('dev-delay-input');
+    if (input) input.addEventListener('input', function() { updateDevDesc(this.value); });
+})();
+</script>
+{% endblock %}

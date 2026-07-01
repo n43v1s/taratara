@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('mapping.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('mapping.title') }}</h1>
+    <p>{{ t('mapping.subtitle') }}</p>
+</div>
+
+{% if error %}
+<div class="alert alert-error">{{ error }} <a href="/form">{{ t('mapping.parse_link') }}</a></div>
+{% endif %}
+
+{% if saved %}
+<div class="alert alert-success">
+    {{ t('mapping.saved') }} <a href="/config">{{ t('mapping.saved_next') }}</a>
+</div>
+{% endif %}
+
+{% if matches %}
+<form method="post" action="/mapping/confirm">
+    <div class="card">
+        <h2>{{ t('mapping.match_title') }}</h2>
+        <p style="font-size:0.9rem; color:#555; margin-bottom:1rem;">
+            {{ t('mapping.match_hint') | safe }}
+        </p>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>{{ t('mapping.col_num') }}</th>
+                    <th>{{ t('mapping.col_form_label') }}</th>
+                    <th>{{ t('mapping.col_internal') }}</th>
+                    <th>{{ t('mapping.col_confidence') }}</th>
+                    <th>{{ t('mapping.col_status') }}</th>
+                    <th>{{ t('mapping.col_entry_id') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in matches %}
+                <tr class="{% if match.status == 'unmapped' %}row-warning{% endif %}">
+                    <td>{{ loop.index }}</td>
+                    <td>
+                        {{ match.label }}
+                        {% if match.options %}
+                        <ul class="option-list" style="margin-top:0.25rem;">
+                            {% for opt in match.options %}
+                            <li>{{ opt }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <select name="mapping_{{ loop.index0 }}" class="field-select {% if match.status == 'unmapped' %}select-warning{% endif %}">
+                            <option value="">{{ t('mapping.no_mapping') }}</option>
+                            {% for field in internal_fields %}
+                            <option value="{{ field }}"
+                                {% if match.internalField == field %}selected{% endif %}>
+                                {{ internal_field_labels[field] }} ({{ field }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        {% if match.status != 'confirmed' %}
+                        <span style="color: {% if match.confidence >= 90 %}#16a34a{% elif match.confidence >= 75 %}#d97706{% else %}#dc2626{% endif %}; font-weight:600;">
+                            {{ match.confidence }}%
+                        </span>
+                        {% else %}
+                        <span style="color:#16a34a; font-weight:600;">✓</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="status-badge {{ match.status }}">{{ match.status }}</span>
+                    </td>
+                    <td><code>{{ match.entryId }}</code></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top:1.5rem; display:flex; gap:1rem; align-items:center;">
+            <button type="submit" class="btn">{{ t('mapping.save_btn') }}</button>
+            <a href="/form" style="font-size:0.9rem; color:#555;">{{ t('mapping.reparse_link') }}</a>
+        </div>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

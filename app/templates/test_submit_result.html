@@ -1,0 +1,14 @@
+{% if success %}
+<div class="alert alert-success" style="margin-top:0.75rem;">
+    <strong>{{ t('test_submit_result.running') }}</strong> {{ message }}
+</div>
+<div hx-get="/logs/{{ run_id }}/fragment"
+     hx-trigger="load"
+     hx-swap="outerHTML">
+    <p style="font-size:0.85rem; color:#94a3b8; margin-top:0.5rem;">{{ t('test_submit_result.loading_log') }}</p>
+</div>
+{% else %}
+<div class="alert alert-error" style="margin-top:0.75rem;">
+    <strong>{{ t('test_submit_result.failed') }}</strong> {{ message }}
+</div>
+{% endif %}

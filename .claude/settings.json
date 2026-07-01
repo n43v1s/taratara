@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(py *)",
+      "Bash(python *)",
+      "Bash(pip *)",
+      "Bash(uvicorn *)",
+      "Bash(pytest *)",
+      "Bash(.venv\\Scripts\\python *)",
+      "Bash(.venv\\Scripts\\pip *)",
+      "Bash(.venv\\Scripts\\uvicorn *)",
+      "Bash(.venv\\Scripts\\pytest *)",
+      "Bash(powershell *)",
+      "Bash(pwsh *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(find *)",
+      "Bash(grep *)"
+    ],
+    "deny": [
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(cloudflared *)"
+    ]
+  }
+}

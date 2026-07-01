@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t('dryrun.title') }} — Tara Caraka Ceria{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ t('dryrun.title') }}</h1>
+    <p>{{ t('dryrun.subtitle') }}</p>
+</div>
+
+{% if not check.ready %}
+<div class="alert alert-error">
+    <strong>{{ t('dryrun.not_ready') }}</strong>
+    <ul style="margin: 0.5rem 0 0 1.25rem;">
+        {% for issue in check.blocking %}
+        <li>{{ issue }}</li>
+        {% endfor %}
+    </ul>
+</div>
+<div style="margin-top:1rem; display:flex; gap:1rem;">
+    <a href="/form" class="btn">{{ t('dryrun.btn_form') }}</a>
+    <a href="/mapping" class="btn" style="background:#4b5563;">{{ t('dryrun.btn_mapping') }}</a>
+    <a href="/config" class="btn" style="background:#4b5563;">{{ t('dryrun.btn_config') }}</a>
+</div>
+
+{% else %}
+
+{% if check.warnings %}
+<div class="alert" style="background:#fffbeb; border:1px solid #fde68a; color:#854d0e;">
+    {% for w in check.warnings %}<div>⚠ {{ w }}</div>{% endfor %}
+</div>
+{% endif %}
+
+{% if not result %}
+<div class="card" style="max-width:560px;">
+    <h2>{{ t('dryrun.ready_title') }}</h2>
+    <p style="color:#555; margin-bottom:1.25rem;">{{ t('dryrun.ready_desc') }}</p>
+    <form method="post" action="/dryrun/run">
+        <button type="submit" class="btn">{{ t('dryrun.run_btn') }}</button>
+    </form>
+</div>
+{% endif %}
+
+{% if result and result.status == "scheduled" %}
+<div class="alert" style="background:#eff6ff; border:1px solid #93c5fd; color:#1e40af;">
+    {{ t('dryrun.running', run_id=result.runId) }}
+</div>
+<div id="dryrun-log-live"
+     hx-get="/logs/{{ result.runId }}/fragment"
+     hx-trigger="load, every 2s"
+     hx-swap="outerHTML">
+    <p style="color:#6b7280; font-size:0.9rem;">{{ t('dryrun.waiting_log') }}</p>
+</div>
+{% endif %}
+
+{% if result and result.status not in ("scheduled",) %}
+<div class="alert alert-success">
+    {{ t('dryrun.success', run_id=result.runId) | safe }}
+    <a href="/submit/prepare" style="margin-left:1rem;">{{ t('dryrun.next_submit') }}</a>
+</div>
+<div style="margin-bottom:1rem;">
+    <form method="post" action="/dryrun/run" style="display:inline;">
+        <button type="submit" class="btn" style="background:#4b5563;">{{ t('dryrun.rerun_btn') }}</button>
+    </form>
+</div>
+
+<div class="card" style="margin-top:1.25rem;">
+    <h2>{{ t('dryrun.summary_title') }}</h2>
+    <table class="info-table">
+        <tr><th>{{ t('dryrun.row_run_id') }}</th><td><code>{{ result.runId }}</code></td></tr>
+        <tr><th>{{ t('dryrun.row_time') }}</th><td>{{ result.startedAt }}</td></tr>
+        <tr><th>{{ t('dryrun.row_endpoint') }}</th><td><code style="font-size:0.8rem; word-break:break-all;">{{ result.responseUrl }}</code></td></tr>
+        <tr><th>{{ t('dryrun.row_status') }}</th><td><span class="status-badge confirmed">{{ result.status }}</span></td></tr>
+    </table>
+</div>
+
+<div class="card" style="margin-top:1.25rem;">
+    <h2>{{ t('dryrun.payload_title') }}</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>{{ t('dryrun.col_field') }}</th>
+                <th>{{ t('dryrun.col_entry_id') }}</th>
+                <th>{{ t('dryrun.col_value') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry_id, value in result.payload.items() %}
+            {% if entry_id != "fbzx" %}
+            <tr>
+                <td style="color:#374151; font-weight:600; font-size:0.88rem;">
+                    {{ result.entryToField.get(entry_id, "—") }}
+                </td>
+                <td><code>{{ entry_id }}</code></td>
+                <td>
+                    {% if value is iterable and value is not string %}
+                        {% for v in value %}<div>{{ v }}</div>{% endfor %}
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card" style="margin-top:1.25rem;">
+    <h2>{{ t('dryrun.log_title') }}</h2>
+    <pre class="log-output">{% for line in result.logLines %}{{ line }}
+{% endfor %}</pre>
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}
