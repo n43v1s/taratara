@@ -13,19 +13,50 @@ REQUIRED_FIELDS = [
     "parentName", "satker", "phoneNumber", "address", "allergy",
 ]
 
+DEFAULT_CONFIG = {
+    "childName": "",
+    "birthInfo": "",
+    "childAge": "",
+    "gender": "",
+    "religion": "",
+    "parentName": "",
+    "satker": "",
+    "phoneNumber": "",
+    "address": "",
+    "allergy": "",
+    "bookingDates": [],
+    "attemptTimes": ["12:59:58", "12:59:59", "13:00:00"],
+    "configUpdatedAt": "",
+}
+
+DEFAULT_FORM_PROFILE = {
+    "sessionId": "",
+    "sessionLabel": "",
+    "formUrl": "",
+    "formId": "",
+    "responseUrl": "",
+    "fbzx": "",
+    "parsedAt": "",
+    "fields": [],
+    "mappings": {},
+}
+
 
 def _read_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
 def _write_json(path: Path, data: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
 def get_config() -> dict:
-    return _read_json(CONFIG_FILE)
+    return {**DEFAULT_CONFIG, **_read_json(CONFIG_FILE)}
 
 
 def save_config(data: dict, field_values_changed: bool = True) -> None:
@@ -36,7 +67,7 @@ def save_config(data: dict, field_values_changed: bool = True) -> None:
 
 
 def get_form_profile() -> dict:
-    return _read_json(FORM_PROFILE_FILE)
+    return {**DEFAULT_FORM_PROFILE, **_read_json(FORM_PROFILE_FILE)}
 
 
 def save_form_profile(data: dict) -> None:

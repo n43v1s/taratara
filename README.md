@@ -46,7 +46,7 @@ The web control panel should support:
 - Show dry-run report/log.
 - Prepare submit with summary.
 - Require explicit confirmation before real submit.
-- Execute the existing PowerShell scheduler submit.
+- Execute the scheduler submit. Ubuntu uses the Python scheduler; Windows can keep using the legacy PowerShell script if needed.
 - Show scheduler status and latest logs.
 
 ## Tech Stack Decision
@@ -59,13 +59,13 @@ Python FastAPI
 + HTMX or small vanilla JavaScript
 + simple CSS / lightweight UI styling
 + JSON files for config, form profiles, run history, and logs
-+ background PowerShell scheduler runner for tara-caraka-form.ps1
++ background scheduler runner
 ```
 
 Reasons:
 
 - The app is a local control panel, not a complex public frontend.
-- It still needs a backend to update config, parse Google Forms, read logs, and execute PowerShell.
+- It still needs a backend to update config, parse Google Forms, read logs, and execute the scheduler.
 - React is not required for the first version because most screens are forms, tables, buttons, confirmations, and log views.
 - Avoiding React keeps the project smaller: no separate frontend build, fewer dependencies, fewer moving parts, and simpler debugging.
 - Python is a good fit for HTML parsing, JSON handling, fuzzy matching, and launching PowerShell on Windows.
@@ -78,21 +78,44 @@ Possible later alternatives:
 - React can be added later if the UI becomes much more interactive.
 - n8n can remain a supporting tool, but it is not the primary interface for this automation.
 
+## Ubuntu Local Setup
+
+The original scheduler was written for Windows PowerShell. On Ubuntu, use the
+Python scheduler entrypoint instead; the FastAPI routes launch
+`python -m app.scheduler_cli` for dry-run, test submit, and real submit.
+
+Install the OS venv package first if Python does not include `ensurepip`:
+
+```bash
+sudo apt install python3.14-venv
+```
+
+Then set up and start the project:
+
+```bash
+./scripts/setup_ubuntu.sh
+./scripts/start_ubuntu.sh
+```
+
+The server starts at `http://127.0.0.1:8000` by default. Runtime JSON files are
+created from `data/*.example.json` when missing, while run history and logs live
+under `data/runs/` and `data/logs/`.
+
 ## Background Scheduler Execution Model
 
-Real submit timing is handled by a background PowerShell scheduler process, not by a long-running browser request.
+Real submit timing is handled by a background scheduler process, not by a long-running browser request.
 
 Implemented execution model:
 
 ```text
 User clicks Confirm Submit
 -> FastAPI validates config, mapping, dry-run status (no active scheduler lock)
--> FastAPI starts tara-caraka-form.ps1 as a background process (CREATE_NEW_CONSOLE + -NoExit)
+-> FastAPI starts the scheduler as a background process
 -> FastAPI immediately returns "scheduler started"
--> PowerShell writes its own lock file after starting
--> PowerShell process waits for configured submit times
--> PowerShell sends async submit attempts at 12:59:58, 12:59:59, and 13:00:00
--> PowerShell writes run record and log file (UTF-8 without BOM)
+-> Scheduler writes its own lock file after starting
+-> Scheduler process waits for configured submit times
+-> Scheduler sends submit attempts at configured times
+-> Scheduler writes run record and log file
 -> FastAPI reads logs/status for the UI
 ```
 

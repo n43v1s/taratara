@@ -1,7 +1,7 @@
 import json
 import subprocess
+import sys
 from datetime import datetime
-from pathlib import Path
 
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
@@ -10,9 +10,6 @@ from app.services.validator import check_ready
 from app.services.scheduler_runner import get_run, read_log, _new_run_id, RUNS_DIR, LOGS_DIR
 from app.services.config_handler import get_form_profile
 from app.render import render
-
-BASE_DIR   = Path(__file__).parent.parent
-PS1_SCRIPT = BASE_DIR.parent / "tara-caraka-form.ps1"
 
 router = APIRouter(prefix="/dryrun")
 
@@ -56,15 +53,14 @@ async def dryrun_run(request: Request):
 
     try:
         cmd = [
-            "powershell.exe",
-            "-ExecutionPolicy", "Bypass",
-            "-File", str(PS1_SCRIPT),
-            "-Mode", "DryRun",
-            "-RunId", run_id,
+            sys.executable,
+            "-m", "app.scheduler_cli",
+            "--mode", "dryrun",
+            "--run-id", run_id,
+            "--record-mode", "dryrun",
         ]
         subprocess.Popen(
             cmd,
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
             close_fds=True,
         )
     except Exception as e:

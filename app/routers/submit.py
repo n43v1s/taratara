@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -14,7 +15,6 @@ from app.render import render
 BASE_DIR = Path(__file__).parent.parent
 DATA_DIR  = BASE_DIR.parent / "data"
 LOCK_FILE = DATA_DIR / "scheduler.lock"
-PS1_SCRIPT = BASE_DIR.parent / "tara-caraka-form.ps1"
 router = APIRouter(prefix="/submit")
 
 
@@ -63,18 +63,17 @@ async def confirm_submit(request: Request):
 
     run_id = _new_run_id()
 
-    # Launch PowerShell as background process — PS script writes the lock itself
+    # Launch Ubuntu-native Python scheduler as a background process.
     try:
         cmd = [
-            "powershell.exe",
-            "-ExecutionPolicy", "Bypass",
-            "-File", str(PS1_SCRIPT),
-            "-Mode", "Submit",
-            "-RunId", run_id,
+            sys.executable,
+            "-m", "app.scheduler_cli",
+            "--mode", "submit",
+            "--run-id", run_id,
+            "--record-mode", "submit",
         ]
         subprocess.Popen(
             cmd,
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
             close_fds=True,
         )
     except Exception as e:
@@ -120,7 +119,7 @@ async def test_submit(request: Request, delay_seconds: int = Form(30)):
     if not check["ready"]:
         return render(request, "test_submit_result.html", {
             "success": False,
-            "message": "Belum siap: " + "; ".join(check.get("errors", [])),
+            "message": "Belum siap: " + "; ".join(check.get("blocking", [])),
             "run_id": None,
         })
 
@@ -142,16 +141,15 @@ async def test_submit(request: Request, delay_seconds: int = Form(30)):
 
     try:
         cmd = [
-            "powershell.exe",
-            "-ExecutionPolicy", "Bypass",
-            "-File", str(PS1_SCRIPT),
-            "-Mode", "Submit",
-            "-RunId", run_id,
-            "-AttemptTimesOverride", attempt_times,
+            sys.executable,
+            "-m", "app.scheduler_cli",
+            "--mode", "submit",
+            "--run-id", run_id,
+            "--record-mode", "submit-test",
+            "--attempt-times-override", attempt_times,
         ]
         subprocess.Popen(
             cmd,
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
             close_fds=True,
         )
     except Exception as e:

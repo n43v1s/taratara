@@ -7,7 +7,7 @@ LOCK_FILE = DATA_DIR / "scheduler.lock"
 
 REQUIRED_MAPPINGS = [
     "childName", "birthInfo", "childAge", "gender", "religion",
-    "parentName", "phoneNumber", "address", "allergy", "bookingDates",
+    "parentName", "satker", "phoneNumber", "address", "allergy", "bookingDates",
 ]
 
 

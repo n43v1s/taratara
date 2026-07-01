@@ -1,0 +1,19 @@
+{
+  "childName": "",
+  "birthInfo": "",
+  "childAge": "",
+  "gender": "",
+  "religion": "",
+  "parentName": "",
+  "satker": "",
+  "phoneNumber": "",
+  "address": "",
+  "allergy": "",
+  "bookingDates": [],
+  "attemptTimes": [
+    "12:59:58",
+    "12:59:59",
+    "13:00:00"
+  ],
+  "configUpdatedAt": ""
+}

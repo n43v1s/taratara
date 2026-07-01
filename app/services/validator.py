@@ -4,7 +4,7 @@ from app.services.config_handler import (
 
 REQUIRED_MAPPINGS = [
     "childName", "birthInfo", "childAge", "gender", "religion",
-    "parentName", "phoneNumber", "address", "allergy", "bookingDates",
+    "parentName", "satker", "phoneNumber", "address", "allergy", "bookingDates",
 ]
 
 
